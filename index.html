@@ -1,95 +1,94 @@
 <!DOCTYPE html>
-<html lang="en">
+<html lang="ko">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Lotto Number Generator</title>
-    <style>
-        body {
-            font-family: sans-serif;
-            display: flex;
-            justify-content: center;
-            align-items: center;
-            min-height: 100vh;
-            background-color: #f0f0f0;
-            margin: 0;
-        }
-
-        .container {
-            text-align: center;
-            background-color: white;
-            padding: 2rem;
-            border-radius: 10px;
-            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
-        }
-
-        h1 {
-            color: #333;
-        }
-
-        .numbers-container {
-            display: flex;
-            justify-content: center;
-            gap: 1rem;
-            margin: 2rem 0;
-        }
-
-        .number {
-            width: 50px;
-            height: 50px;
-            border-radius: 50%;
-            background-color: #eee;
-            display: flex;
-            justify-content: center;
-            align-items: center;
-            font-size: 1.5rem;
-            font-weight: bold;
-            color: #333;
-        }
-
-        #generate-btn {
-            background-color: #4CAF50;
-            color: white;
-            border: none;
-            padding: 1rem 2rem;
-            font-size: 1rem;
-            border-radius: 5px;
-            cursor: pointer;
-            transition: background-color 0.3s;
-        }
-
-        #generate-btn:hover {
-            background-color: #45a049;
-        }
-    </style>
+    <title>Task management</title>
+    <link rel="stylesheet" href="style.css">
 </head>
 <body>
     <div class="container">
-        <h1>Lotto Number Generator</h1>
-        <div id="numbers-container" class="numbers-container"></div>
-        <button id="generate-btn">Generate Numbers</button>
+        <header>
+            <h1>Task management</h1>
+            <div class="header-controls">
+                <button id="stats-toggle-btn" class="icon-btn" aria-label="Toggle Statistics">📊</button>
+                <button id="theme-toggle" class="icon-btn" aria-label="Toggle Dark Mode">
+                    <span class="sun">☀️</span>
+                    <span class="moon">🌙</span>
+                </button>
+            </div>
+        </header>
+
+        <section id="stats-dashboard" class="card hidden">
+            <div class="stats-header">
+                <h2>Statistics</h2>
+                <button id="close-stats" class="close-btn">&times;</button>
+            </div>
+            <div class="stats-content">
+                <div class="chart-wrapper">
+                    <div id="stat-percentage" class="percentage-label">0%</div>
+                    <div class="chart-container">
+                        <svg viewBox="0 0 36 36" class="circular-chart">
+                            <path class="circle-bg"
+                                d="M18 2.0845
+                                    a 15.9155 15.9155 0 0 1 0 31.831
+                                    a 15.9155 15.9155 0 0 1 0 -31.831"
+                            />
+                            <path id="progress-circle" class="circle"
+                                stroke-dasharray="0, 100"
+                                d="M18 2.0845
+                                    a 15.9155 15.9155 0 0 1 0 31.831
+                                    a 15.9155 15.9155 0 0 1 0 -31.831"
+                            />
+                        </svg>
+                    </div>
+                </div>
+                <div class="stats-grid">
+                    <div class="stat-item">
+                        <span class="stat-label">Weekly Completions</span>
+                        <span id="weekly-count" class="stat-value">0</span>
+                    </div>
+                    <div class="stat-item">
+                        <span class="stat-label">Monthly Completions</span>
+                        <span id="monthly-count" class="stat-value">0</span>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <section id="input-section" class="card">
+            <form id="todo-form">
+                <div class="input-group">
+                    <input type="text" id="todo-input" placeholder="What needs to be done?" required>
+                </div>
+                <div class="options-group">
+                    <select id="todo-category">
+                        <option value="General">General</option>
+                        <option value="Work">Work</option>
+                        <option value="Personal">Personal</option>
+                        <option value="Health">Health</option>
+                    </select>
+                    <input type="date" id="todo-date">
+                    <select id="todo-type">
+                        <option value="task">Task</option>
+                        <option value="habit">Habit</option>
+                    </select>
+                </div>
+                <button type="submit" id="add-btn">Add Item</button>
+            </form>
+        </section>
+
+        <main>
+            <div class="filter-bar">
+                <button class="filter-btn active" data-filter="all">All</button>
+                <button class="filter-btn" data-filter="task">Tasks</button>
+                <button class="filter-btn" data-filter="habit">Habits</button>
+            </div>
+            <ul id="todo-list">
+                <!-- Items will be added here dynamically -->
+            </ul>
+        </main>
     </div>
-    <script>
-        const numbersContainer = document.getElementById('numbers-container');
-        const generateBtn = document.getElementById('generate-btn');
-
-        generateBtn.addEventListener('click', () => {
-            numbersContainer.innerHTML = '';
-            const numbers = new Set();
-            while (numbers.size < 6) {
-                const randomNumber = Math.floor(Math.random() * 45) + 1;
-                numbers.add(randomNumber);
-            }
-
-            const sortedNumbers = Array.from(numbers).sort((a, b) => a - b);
-
-            sortedNumbers.forEach(number => {
-                const numberDiv = document.createElement('div');
-                numberDiv.classList.add('number');
-                numberDiv.textContent = number;
-                numbersContainer.appendChild(numberDiv);
-            });
-        });
-    </script>
+    <script src="main.js"></script>
 </body>
 </html>
