@@ -251,10 +251,6 @@ function render() {
             <input type="checkbox" class="todo-checkbox" ${item.completed ? 'checked' : ''}>
             <div class="todo-content">
                 <span class="todo-text">${item.text}</span>
-                <div class="todo-meta">
-                    <span class="todo-badge">${item.type}</span>
-                    <span>${item.date}</span>
-                </div>
             </div>
             <button class="delete-btn" aria-label="Delete">&times;</button>
         `;
