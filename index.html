@@ -69,14 +69,24 @@
         <div id="main-content-wrapper">
             <section id="input-section" class="card">
                 <form id="todo-form">
-                    <div class="type-selector">
-                        <button type="button" class="type-btn active" data-type="Task">Task</button>
-                        <button type="button" class="type-btn" data-type="Habit">Habit</button>
+                    <div class="form-main-row">
+                        <div class="type-selector">
+                            <button type="button" class="type-btn active" data-type="Task">Task</button>
+                            <button type="button" class="type-btn" data-type="Habit">Habit</button>
+                        </div>
+                        <div class="input-group">
+                            <input type="text" id="todo-input" placeholder="What needs to be done?" required>
+                        </div>
+                        <button type="submit" id="add-btn">Add</button>
                     </div>
-                    <div class="input-group">
-                        <input type="text" id="todo-input" placeholder="What needs to be done?" required>
+                    <div id="habit-options" class="hidden">
+                        <div class="range-picker">
+                            <label for="habit-start-date">From:</label>
+                            <input type="date" id="habit-start-date">
+                            <label for="habit-end-date">To:</label>
+                            <input type="date" id="habit-end-date">
+                        </div>
                     </div>
-                    <button type="submit" id="add-btn">Add</button>
                 </form>
             </section>
 

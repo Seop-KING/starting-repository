@@ -189,63 +189,46 @@ h2 {
 /* Form Styling */
 #todo-form {
     display: flex;
+    flex-direction: column;
+    gap: 0.75rem;
+}
+
+.form-main-row {
+    display: flex;
     flex-direction: row;
     align-items: center;
     gap: 0.75rem;
 }
 
-.type-selector {
+#habit-options {
+    margin-top: 0.5rem;
+    padding-top: 0.75rem;
+    border-top: 1px dashed var(--border-color);
+}
+
+#habit-options.hidden {
+    display: none;
+}
+
+.range-picker {
     display: flex;
-    background-color: var(--bg-primary);
-    border: 1px solid var(--border-color);
-    border-radius: 4px;
-    overflow: hidden;
-}
-
-.type-btn {
-    background: none;
-    border: none;
-    padding: 0.5rem 0.8rem;
-    font-size: 0.85rem;
-    font-weight: 600;
+    align-items: center;
+    gap: 0.5rem;
+    font-size: 0.9rem;
     color: var(--text-muted);
-    cursor: pointer;
-    transition: var(--transition);
 }
 
-.type-btn.active {
-    background-color: var(--accent-color);
-    color: var(--accent-contrast);
+.range-picker label {
+    font-weight: 600;
 }
 
-.input-group {
-    flex-grow: 1;
-}
-
-.input-group input {
-    width: 100%;
-    padding: 0.7rem 0.8rem;
+.range-picker input[type="date"] {
+    padding: 0.3rem 0.5rem;
     border: 1px solid var(--border-color);
     border-radius: 4px;
     background-color: var(--bg-primary);
     color: var(--text-main);
-    font-size: 1rem;
-}
-
-#add-btn {
-    padding: 0.7rem 1.2rem;
-    border: none;
-    border-radius: 4px;
-    background-color: var(--accent-color);
-    color: var(--accent-contrast);
-    font-weight: 700;
-    cursor: pointer;
-    transition: opacity 0.2s;
-    white-space: nowrap;
-}
-
-#add-btn:hover {
-    opacity: 0.8;
+    font-size: 0.85rem;
 }
 
 /* Filter Bar */

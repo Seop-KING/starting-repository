@@ -18,6 +18,9 @@ let state = {
 const todoForm = document.getElementById('todo-form');
 const todoInput = document.getElementById('todo-input');
 const typeBtns = document.querySelectorAll('.type-btn');
+const habitOptions = document.getElementById('habit-options');
+const habitStartDateInput = document.getElementById('habit-start-date');
+const habitEndDateInput = document.getElementById('habit-end-date');
 const todoList = document.getElementById('todo-list');
 const themeToggle = document.getElementById('theme-toggle');
 const statsToggleBtn = document.getElementById('stats-toggle-btn');
@@ -46,6 +49,10 @@ function init() {
     
     // Default to Task type on entry
     state.selectedType = 'Task';
+    
+    // Initialize habit dates
+    habitStartDateInput.value = state.selectedDate;
+    habitEndDateInput.value = state.selectedDate;
 
     // Set initial theme
     document.body.setAttribute('data-theme', state.theme);
@@ -110,6 +117,13 @@ function updateDays() {
             document.querySelectorAll('.day-item').forEach(el => el.classList.remove('active'));
             dayItem.classList.add('active');
             state.selectedDate = dateStr;
+            
+            // Update habit start date when calendar date changes
+            habitStartDateInput.value = dateStr;
+            if (habitEndDateInput.value < dateStr) {
+                habitEndDateInput.value = dateStr;
+            }
+            
             saveState();
             render();
         });
@@ -132,17 +146,46 @@ function saveState() {
 todoForm.addEventListener('submit', (e) => {
     e.preventDefault();
 
-    const newItem = {
-        id: Date.now(),
-        text: todoInput.value,
-        type: state.selectedType,
-        date: state.selectedDate,
-        category: 'General',
-        completed: false,
-        completedAt: [] 
-    };
+    if (state.selectedType === 'Habit') {
+        const startDate = new Date(habitStartDateInput.value);
+        const endDate = new Date(habitEndDateInput.value);
+        
+        if (endDate < startDate) {
+            alert('End date must be after start date');
+            return;
+        }
 
-    state.items.unshift(newItem);
+        const itemsToAdd = [];
+        let currentDate = new Date(startDate);
+        
+        while (currentDate <= endDate) {
+            const dateStr = getLocalDateString(currentDate);
+            itemsToAdd.push({
+                id: Date.now() + Math.random(), // Unique ID for each day
+                text: todoInput.value,
+                type: 'Habit',
+                date: dateStr,
+                category: 'General',
+                completed: false,
+                completedAt: []
+            });
+            currentDate.setDate(currentDate.getDate() + 1);
+        }
+        
+        state.items = [...itemsToAdd, ...state.items];
+    } else {
+        const newItem = {
+            id: Date.now(),
+            text: todoInput.value,
+            type: 'Task',
+            date: state.selectedDate,
+            category: 'General',
+            completed: false,
+            completedAt: [] 
+        };
+        state.items.unshift(newItem);
+    }
+
     todoInput.value = '';
     saveState();
     render();
@@ -154,6 +197,14 @@ typeBtns.forEach(btn => {
         typeBtns.forEach(b => b.classList.remove('active'));
         btn.classList.add('active');
         state.selectedType = btn.dataset.type;
+        
+        if (state.selectedType === 'Habit') {
+            habitOptions.classList.remove('hidden');
+            habitStartDateInput.value = state.selectedDate;
+            habitEndDateInput.value = state.selectedDate;
+        } else {
+            habitOptions.classList.add('hidden');
+        }
     });
 });
 
