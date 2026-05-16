@@ -10,8 +10,10 @@ let state = {
     items: [],
     theme: 'light',
     filter: 'all',
-    selectedDates: [getLocalDateString()], // Now an array
-    selectedType: 'Task'
+    selectedDate: getLocalDateString(),
+    selectedType: 'Task',
+    habitStartDate: null,
+    habitEndDate: null,
 };
 
 // DOM Elements
@@ -19,8 +21,6 @@ const todoForm = document.getElementById('todo-form');
 const todoInput = document.getElementById('todo-input');
 const typeBtns = document.querySelectorAll('.type-btn');
 const habitOptions = document.getElementById('habit-options');
-const habitStartDateInput = document.getElementById('habit-start-date');
-const habitEndDateInput = document.getElementById('habit-end-date');
 const habitTodoInput = document.getElementById('habit-todo-input');
 const todoList = document.getElementById('todo-list');
 const themeToggle = document.getElementById('theme-toggle');
@@ -45,12 +45,11 @@ function init() {
         state = JSON.parse(savedState);
     }
 
-    state.selectedDates = [getLocalDateString()];
+    state.selectedDate = getLocalDateString();
     state.selectedType = 'Task';
+    state.habitStartDate = null;
+    state.habitEndDate = null;
     
-    habitStartDateInput.value = state.selectedDates[0];
-    habitEndDateInput.value = state.selectedDates[0];
-
     document.body.setAttribute('data-theme', state.theme);
 
     setupCalendar();
@@ -100,45 +99,69 @@ function updateDays() {
 
         const dayItem = document.createElement('div');
         dayItem.className = 'day-item';
-        if (state.selectedDates.includes(dateStr)) dayItem.classList.add('active');
 
         dayItem.innerHTML = `
             <span class="day-name">${dayName}</span>
             <span class="day-number">${i}</span>
         `;
 
-        dayItem.addEventListener('click', (e) => {
-            if (e.ctrlKey || e.metaKey) {
-                if (state.selectedDates.includes(dateStr)) {
-                    state.selectedDates = state.selectedDates.filter(d => d !== dateStr);
-                    dayItem.classList.remove('active');
+        dayItem.addEventListener('click', () => {
+            if (state.selectedType === 'Habit') {
+                if (!state.habitStartDate || state.habitEndDate) {
+                    state.habitStartDate = dateStr;
+                    state.habitEndDate = null;
                 } else {
-                    state.selectedDates.push(dateStr);
-                    dayItem.classList.add('active');
+                    const startDate = new Date(state.habitStartDate);
+                    const clickedDate = new Date(dateStr);
+                    if (clickedDate < startDate) {
+                        state.habitStartDate = dateStr;
+                    } else {
+                        state.habitEndDate = dateStr;
+                    }
                 }
             } else {
-                document.querySelectorAll('.day-item').forEach(el => el.classList.remove('active'));
-                state.selectedDates = [dateStr];
-                dayItem.classList.add('active');
+                state.selectedDate = dateStr;
+                state.habitStartDate = null;
+                state.habitEndDate = null;
             }
-            
-            habitStartDateInput.value = state.selectedDates[0];
-            if (state.selectedDates.length > 1) {
-              habitEndDateInput.value = state.selectedDates[state.selectedDates.length - 1];
-            } else {
-              habitEndDateInput.value = state.selectedDates[0];
-            }
-            
             saveState();
             render();
         });
 
         daysContainer.appendChild(dayItem);
-
-        if (dateStr === state.selectedDates[0]) {
-            dayItem.scrollIntoView({ behavior: 'smooth', block: 'nearest', inline: 'center' });
-        }
     }
+    updateCalendarSelection();
+    
+    const selectedEl = daysContainer.querySelector(`.day-item[data-date="${state.selectedDate}"]`);
+    if (selectedEl) {
+        selectedEl.scrollIntoView({ behavior: 'smooth', block: 'nearest', inline: 'center' });
+    }
+}
+
+function updateCalendarSelection() {
+    document.querySelectorAll('.day-item').forEach(el => {
+        el.classList.remove('active', 'in-range', 'range-start', 'range-end');
+        const dateStr = el.dataset.date;
+
+        if (state.selectedType === 'Habit' && state.habitStartDate) {
+            const startDate = new Date(state.habitStartDate);
+            const endDate = state.habitEndDate ? new Date(state.habitEndDate) : null;
+            const currentDate = new Date(dateStr);
+
+            if (endDate && currentDate >= startDate && currentDate <= endDate) {
+                el.classList.add('in-range');
+            }
+            if (dateStr === state.habitStartDate) {
+                el.classList.add('active', 'range-start');
+            }
+            if (dateStr === state.habitEndDate) {
+                el.classList.add('active', 'range-end');
+            }
+
+        } else if (dateStr === state.selectedDate) {
+            el.classList.add('active');
+        }
+    });
 }
 
 function saveState() {
@@ -149,13 +172,13 @@ todoForm.addEventListener('submit', (e) => {
     e.preventDefault();
 
     if (state.selectedType === 'Habit') {
-        const startDate = new Date(habitStartDateInput.value);
-        const endDate = new Date(habitEndDateInput.value);
-        
-        if (endDate < startDate) {
-            alert('End date must be after start date');
+        if (!state.habitStartDate || !state.habitEndDate) {
+            alert('Please select a start and end date for the habit on the calendar.');
             return;
         }
+
+        const startDate = new Date(state.habitStartDate);
+        const endDate = new Date(state.habitEndDate);
 
         const itemsToAdd = [];
         let currentDate = new Date(startDate);
@@ -171,7 +194,7 @@ todoForm.addEventListener('submit', (e) => {
                 completed: false,
                 completedAt: []
             });
-            if(habitTodoInput.value) {
+            if (habitTodoInput.value) {
               itemsToAdd.push({
                   id: Date.now() + Math.random(),
                   text: habitTodoInput.value,
@@ -186,19 +209,20 @@ todoForm.addEventListener('submit', (e) => {
         }
         
         state.items = [...itemsToAdd, ...state.items];
+        state.habitStartDate = null;
+        state.habitEndDate = null;
+
     } else {
-        state.selectedDates.forEach(dateStr => {
-          const newItem = {
-              id: Date.now() + Math.random(),
-              text: todoInput.value,
-              type: 'Task',
-              date: dateStr,
-              category: 'General',
-              completed: false,
-              completedAt: [] 
-          };
-          state.items.unshift(newItem);
-        });
+        const newItem = {
+            id: Date.now() + Math.random(),
+            text: todoInput.value,
+            type: 'Task',
+            date: state.selectedDate,
+            category: 'General',
+            completed: false,
+            completedAt: [] 
+        };
+        state.items.unshift(newItem);
     }
 
     todoInput.value = '';
@@ -212,14 +236,16 @@ typeBtns.forEach(btn => {
         typeBtns.forEach(b => b.classList.remove('active'));
         btn.classList.add('active');
         state.selectedType = btn.dataset.type;
+
+        state.habitStartDate = null;
+        state.habitEndDate = null;
         
         if (state.selectedType === 'Habit') {
             habitOptions.classList.remove('hidden');
-            habitStartDateInput.value = state.selectedDates[0];
-            habitEndDateInput.value = state.selectedDates[0];
         } else {
             habitOptions.classList.add('hidden');
         }
+        render();
     });
 });
 
@@ -275,16 +301,13 @@ function updateStats() {
 
 function render() {
     todoList.innerHTML = '';
+    updateCalendarSelection();
 
     const filteredItems = state.items.filter(item => {
-        if (state.selectedDates.length > 1) {
-          return state.selectedDates.includes(item.date);
-        } else {
-            if (item.date !== state.selectedDates[0]) return false;
+        if (item.date !== state.selectedDate) return false;
 
-            if (state.filter === 'all') return true;
-            return item.type === state.filter;
-        }
+        if (state.filter === 'all') return true;
+        return item.type === state.filter;
     });
 
     if (filteredItems.length === 0) {
