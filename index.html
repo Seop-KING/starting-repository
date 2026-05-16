@@ -9,7 +9,7 @@
 <body>
     <div class="container">
         <header>
-            <h1>Task management</h1>
+            <h1 id="site-title" style="cursor: pointer;">Task management</h1>
             <div class="header-controls">
                 <button id="stats-toggle-btn" class="icon-btn" aria-label="Toggle Statistics">📊</button>
                 <button id="theme-toggle" class="icon-btn" aria-label="Toggle Dark Mode">
@@ -56,38 +56,40 @@
             </div>
         </section>
 
-        <section id="input-section" class="card">
-            <form id="todo-form">
-                <div class="input-group">
-                    <input type="text" id="todo-input" placeholder="What needs to be done?" required>
-                </div>
-                <div class="options-group">
-                    <select id="todo-category">
-                        <option value="General">General</option>
-                        <option value="Work">Work</option>
-                        <option value="Personal">Personal</option>
-                        <option value="Health">Health</option>
-                    </select>
-                    <input type="date" id="todo-date">
-                    <select id="todo-type">
-                        <option value="task">Task</option>
-                        <option value="habit">Habit</option>
-                    </select>
-                </div>
-                <button type="submit" id="add-btn">Add Item</button>
-            </form>
-        </section>
+        <div id="main-content-wrapper">
+            <section id="input-section" class="card">
+                <form id="todo-form">
+                    <div class="input-group">
+                        <input type="text" id="todo-input" placeholder="What needs to be done?" required>
+                    </div>
+                    <div class="options-group">
+                        <select id="todo-category">
+                            <option value="General">General</option>
+                            <option value="Work">Work</option>
+                            <option value="Personal">Personal</option>
+                            <option value="Health">Health</option>
+                        </select>
+                        <input type="date" id="todo-date">
+                        <select id="todo-type">
+                            <option value="task">Task</option>
+                            <option value="habit">Habit</option>
+                        </select>
+                    </div>
+                    <button type="submit" id="add-btn">Add Item</button>
+                </form>
+            </section>
 
-        <main>
-            <div class="filter-bar">
-                <button class="filter-btn active" data-filter="all">All</button>
-                <button class="filter-btn" data-filter="task">Tasks</button>
-                <button class="filter-btn" data-filter="habit">Habits</button>
-            </div>
-            <ul id="todo-list">
-                <!-- Items will be added here dynamically -->
-            </ul>
-        </main>
+            <main>
+                <div class="filter-bar">
+                    <button class="filter-btn active" data-filter="all">All</button>
+                    <button class="filter-btn" data-filter="task">Tasks</button>
+                    <button class="filter-btn" data-filter="habit">Habits</button>
+                </div>
+                <ul id="todo-list">
+                    <!-- Items will be added here dynamically -->
+                </ul>
+            </main>
+        </div>
     </div>
     <script src="main.js"></script>
 </body>

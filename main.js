@@ -150,13 +150,27 @@ function render() {
     updateStats();
 }
 
+const mainContentWrapper = document.getElementById('main-content-wrapper');
+const siteTitle = document.getElementById('site-title');
+
 // UI Interactions
 statsToggleBtn.addEventListener('click', () => {
     statsDashboard.classList.toggle('hidden');
+    if (!statsDashboard.classList.contains('hidden')) {
+        mainContentWrapper.style.display = 'none';
+    } else {
+        mainContentWrapper.style.display = 'block';
+    }
 });
 
 closeStatsBtn.addEventListener('click', () => {
     statsDashboard.classList.add('hidden');
+    mainContentWrapper.style.display = 'block';
+});
+
+siteTitle.addEventListener('click', () => {
+    statsDashboard.classList.add('hidden');
+    mainContentWrapper.style.display = 'block';
 });
 
 filterBtns.forEach(btn => {
