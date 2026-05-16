@@ -1,9 +1,16 @@
 // State Management
+const getLocalDateString = (date = new Date()) => {
+    const year = date.getFullYear();
+    const month = String(date.getMonth() + 1).padStart(2, '0');
+    const day = String(date.getDate()).padStart(2, '0');
+    return `${year}-${month}-${day}`;
+};
+
 let state = {
     items: [],
     theme: 'light',
     filter: 'all',
-    selectedDate: new Date().toISOString().split('T')[0]
+    selectedDate: getLocalDateString()
 };
 
 // DOM Elements
@@ -34,7 +41,7 @@ function init() {
     }
 
     // Always default to today's date on entry
-    state.selectedDate = new Date().toISOString().split('T')[0];
+    state.selectedDate = getLocalDateString();
 
     // Set initial theme
     document.body.setAttribute('data-theme', state.theme);
@@ -84,7 +91,7 @@ function updateDays() {
     for (let i = 1; i <= daysInMonth; i++) {
         const date = new Date(year, month, i);
         const dayName = dayNames[date.getDay()];
-        const dateStr = date.toISOString().split('T')[0];
+        const dateStr = getLocalDateString(date);
 
         const dayItem = document.createElement('div');
         dayItem.className = 'day-item';
