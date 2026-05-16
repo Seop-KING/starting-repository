@@ -69,10 +69,17 @@ todoForm.addEventListener('submit', (e) => {
 function toggleComplete(id) {
     const item = state.items.find(i => i.id === id);
     if (item) {
+        const wasCompleted = item.completed;
         item.completed = !item.completed;
-        if (item.completed) {
+        
+        if (item.completed && !wasCompleted) {
+            // Only add timestamp if transitioning from incomplete to completed
             item.completedAt.push(Date.now());
+        } else if (!item.completed && wasCompleted) {
+            // Optional: remove the last completion record if unchecked
+            item.completedAt.pop();
         }
+        
         saveState();
         render();
     }
