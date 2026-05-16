@@ -69,16 +69,14 @@
         <div id="main-content-wrapper">
             <section id="input-section" class="card">
                 <form id="todo-form">
+                    <div class="type-selector">
+                        <button type="button" class="type-btn active" data-type="Task">Task</button>
+                        <button type="button" class="type-btn" data-type="Habit">Habit</button>
+                    </div>
                     <div class="input-group">
                         <input type="text" id="todo-input" placeholder="What needs to be done?" required>
                     </div>
-                    <div class="options-group">
-                        <select id="todo-type">
-                            <option value="Task">Task</option>
-                            <option value="Habit">Habit</option>
-                        </select>
-                    </div>
-                    <button type="submit" id="add-btn">Add Item</button>
+                    <button type="submit" id="add-btn">Add</button>
                 </form>
             </section>
 

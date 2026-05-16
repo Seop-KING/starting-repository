@@ -10,13 +10,14 @@ let state = {
     items: [],
     theme: 'light',
     filter: 'all',
-    selectedDate: getLocalDateString()
+    selectedDate: getLocalDateString(),
+    selectedType: 'Task'
 };
 
 // DOM Elements
 const todoForm = document.getElementById('todo-form');
 const todoInput = document.getElementById('todo-input');
-const todoType = document.getElementById('todo-type');
+const typeBtns = document.querySelectorAll('.type-btn');
 const todoList = document.getElementById('todo-list');
 const themeToggle = document.getElementById('theme-toggle');
 const statsToggleBtn = document.getElementById('stats-toggle-btn');
@@ -42,6 +43,9 @@ function init() {
 
     // Always default to today's date on entry
     state.selectedDate = getLocalDateString();
+    
+    // Default to Task type on entry
+    state.selectedType = 'Task';
 
     // Set initial theme
     document.body.setAttribute('data-theme', state.theme);
@@ -131,7 +135,7 @@ todoForm.addEventListener('submit', (e) => {
     const newItem = {
         id: Date.now(),
         text: todoInput.value,
-        type: todoType.value,
+        type: state.selectedType,
         date: state.selectedDate,
         category: 'General',
         completed: false,
@@ -143,6 +147,16 @@ todoForm.addEventListener('submit', (e) => {
     saveState();
     render();
 });
+
+// Type Selection
+typeBtns.forEach(btn => {
+    btn.addEventListener('click', () => {
+        typeBtns.forEach(b => b.classList.remove('active'));
+        btn.classList.add('active');
+        state.selectedType = btn.dataset.type;
+    });
+});
+
 // Toggle Completion
 function toggleComplete(id) {
     const item = state.items.find(i => i.id === id);
@@ -265,16 +279,6 @@ siteTitle.addEventListener('click', () => {
     statsDashboard.classList.add('hidden');
     mainContentWrapper.style.display = 'block';
 });
-
-filterBtns.forEach(btn => {
-    btn.addEventListener('click', () => {
-        filterBtns.forEach(b => b.classList.remove('active'));
-        btn.classList.add('active');
-        state.filter = btn.dataset.filter;
-        render();
-    });
-});
-
 
 filterBtns.forEach(btn => {
     btn.addEventListener('click', () => {
