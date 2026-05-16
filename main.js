@@ -33,13 +33,15 @@ function init() {
         state = JSON.parse(savedState);
     }
 
+    // Always default to today's date on entry
+    state.selectedDate = new Date().toISOString().split('T')[0];
+
     // Set initial theme
     document.body.setAttribute('data-theme', state.theme);
 
     setupCalendar();
     render();
 }
-
 function setupCalendar() {
     const now = new Date();
     const currentYear = now.getFullYear();
