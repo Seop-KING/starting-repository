@@ -30,6 +30,12 @@ const monthlyCountEl = document.getElementById('monthly-count');
 const statPercentageEl = document.getElementById('stat-percentage');
 const progressCircle = document.getElementById('progress-circle');
 
+const bulkAddToggle = document.getElementById('bulk-add-toggle');
+const bulkAddOptions = document.getElementById('bulk-add-options');
+const startDateInput = document.getElementById('start-date');
+const endDateInput = document.getElementById('end-date');
+
+
 // Initialize
 function init() {
     const savedState = localStorage.getItem('minimal-tracker-state');
@@ -127,19 +133,51 @@ function saveState() {
     localStorage.setItem('minimal-tracker-state', JSON.stringify(state));
 }
 
+bulkAddToggle.addEventListener('change', () => {
+    bulkAddOptions.classList.toggle('hidden');
+});
+
 todoForm.addEventListener('submit', (e) => {
     e.preventDefault();
 
-    const newItem = {
-        id: Date.now(),
-        text: todoInput.value,
-        type: 'Task',
-        date: state.selectedDate,
-        category: 'General',
-        completed: false,
-        completedAt: [] 
-    };
-    state.items.unshift(newItem);
+    const text = todoInput.value.trim();
+    if (!text) return;
+
+    if (bulkAddToggle.checked) {
+        const startDate = new Date(startDateInput.value);
+        const endDate = new Date(endDateInput.value);
+
+        if (isNaN(startDate) || isNaN(endDate) || startDate > endDate) {
+            alert("Please select a valid date range.");
+            return;
+        }
+
+        let currentDate = new Date(startDate);
+        while (currentDate <= endDate) {
+            const newItem = {
+                id: Date.now() + Math.random(), 
+                text: text,
+                type: 'Task',
+                date: getLocalDateString(currentDate),
+                category: 'General',
+                completed: false,
+                completedAt: []
+            };
+            state.items.unshift(newItem);
+            currentDate.setDate(currentDate.getDate() + 1);
+        }
+    } else {
+        const newItem = {
+            id: Date.now(),
+            text: text,
+            type: 'Task',
+            date: state.selectedDate,
+            category: 'General',
+            completed: false,
+            completedAt: [] 
+        };
+        state.items.unshift(newItem);
+    }
 
     todoInput.value = '';
     saveState();
