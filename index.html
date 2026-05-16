@@ -71,19 +71,10 @@
             <section id="input-section" class="card">
                 <form id="todo-form">
                     <div class="form-main-row">
-                        <div class="type-selector">
-                            <button type="button" class="type-btn active" data-type="Task">Task</button>
-                            <button type="button" class="type-btn" data-type="Habit">Habit</button>
-                        </div>
                         <div class="input-group">
                             <input type="text" id="todo-input" placeholder="What needs to be done?" required>
                         </div>
                         <button type="submit" id="add-btn">Add</button>
-                    </div>
-                    <div id="habit-options" class="hidden">
-                        <div class="input-group">
-                            <input type="text" id="habit-todo-input" placeholder="Enter a to-do for each day of the habit">
-                        </div>
                     </div>
                 </form>
             </section>
@@ -92,7 +83,6 @@
                 <div class="filter-bar">
                     <button class="filter-btn active" data-filter="all">All</button>
                     <button class="filter-btn" data-filter="Task">Tasks</button>
-                    <button class="filter-btn" data-filter="Habit">Habits</button>
                 </div>
                 <ul id="todo-list">
                     <!-- Items will be added here dynamically -->

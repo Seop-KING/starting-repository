@@ -195,34 +195,8 @@ h2 {
 
 .form-main-row {
     display: flex;
-    align-items: stretch; /* Make items equal height */
+    align-items: stretch; 
     gap: 0.75rem;
-}
-
-.type-selector {
-    display: flex;
-    gap: 0.5rem;
-}
-
-.type-btn {
-    flex-grow: 1;
-    background: none;
-    border: 1px solid var(--border-color);
-    padding: 0.8rem 1rem;
-    border-radius: 8px;
-    font-size: 0.9rem;
-    font-weight: 600;
-    color: var(--text-muted);
-    cursor: pointer;
-    transition: var(--transition);
-    text-align: center;
-    white-space: nowrap; /* Prevent text wrapping */
-}
-
-.type-btn.active {
-    background-color: var(--accent-color);
-    color: var(--accent-contrast);
-    border-color: var(--accent-color);
 }
 
 .input-group {
@@ -230,7 +204,7 @@ h2 {
     display: flex;
 }
 
-#todo-input, #habit-todo-input {
+#todo-input {
     width: 100%;
     padding: 0.8rem 1rem;
     border: 1px solid var(--border-color);
@@ -239,7 +213,7 @@ h2 {
     color: var(--text-main);
     font-size: 1rem;
 }
-#todo-input::placeholder, #habit-todo-input::placeholder {
+#todo-input::placeholder {
     color: var(--text-muted);
     opacity: 0.7;
 }
@@ -261,41 +235,6 @@ h2 {
     opacity: 0.85;
 }
 
-#habit-options {
-    margin-top: 0.5rem;
-    padding-top: 0.75rem;
-    border-top: 1px dashed var(--border-color);
-    display: flex;
-    flex-direction: column;
-    gap: 0.75rem;
-}
-
-#habit-options.hidden {
-    display: none;
-}
-
-.range-picker {
-    display: flex;
-    align-items: center;
-    gap: 0.5rem;
-    font-size: 0.9rem;
-    color: var(--text-muted);
-}
-
-.range-picker label {
-    font-weight: 600;
-}
-
-.range-picker input[type="date"] {
-    padding: 0.3rem 0.5rem;
-    border: 1px solid var(--border-color);
-    border-radius: 4px;
-    background-color: var(--bg-primary);
-    color: var(--text-main);
-    font-size: 0.85rem;
-}
-
-/* Filter Bar */
 /* Calendar Section */
 #calendar-section {
     padding: 1rem;
