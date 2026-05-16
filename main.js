@@ -10,7 +10,7 @@ let state = {
     items: [],
     theme: 'light',
     filter: 'all',
-    selectedDate: getLocalDateString(),
+    selectedDates: [getLocalDateString()], // Now an array
     selectedType: 'Task'
 };
 
@@ -21,6 +21,7 @@ const typeBtns = document.querySelectorAll('.type-btn');
 const habitOptions = document.getElementById('habit-options');
 const habitStartDateInput = document.getElementById('habit-start-date');
 const habitEndDateInput = document.getElementById('habit-end-date');
+const habitTodoInput = document.getElementById('habit-todo-input');
 const todoList = document.getElementById('todo-list');
 const themeToggle = document.getElementById('theme-toggle');
 const statsToggleBtn = document.getElementById('stats-toggle-btn');
@@ -44,29 +45,23 @@ function init() {
         state = JSON.parse(savedState);
     }
 
-    // Always default to today's date on entry
-    state.selectedDate = getLocalDateString();
-    
-    // Default to Task type on entry
+    state.selectedDates = [getLocalDateString()];
     state.selectedType = 'Task';
     
-    // Initialize habit dates
-    habitStartDateInput.value = state.selectedDate;
-    habitEndDateInput.value = state.selectedDate;
+    habitStartDateInput.value = state.selectedDates[0];
+    habitEndDateInput.value = state.selectedDates[0];
 
-    // Set initial theme
     document.body.setAttribute('data-theme', state.theme);
 
     setupCalendar();
     render();
 }
+
 function setupCalendar() {
     const now = new Date();
     const currentYear = now.getFullYear();
     const currentMonth = now.getMonth();
-    const currentDay = now.getDate();
 
-    // Populate Years (Current +/- 5 years)
     for (let i = currentYear - 5; i <= currentYear + 5; i++) {
         const option = document.createElement('option');
         option.value = i;
@@ -75,7 +70,6 @@ function setupCalendar() {
         yearSelect.appendChild(option);
     }
 
-    // Populate Months
     const monthNames = ["Jan", "Feb", "Mar", "Apr", "May", "Jun", "Jul", "Aug", "Sep", "Oct", "Nov", "Dec"];
     monthNames.forEach((name, index) => {
         const option = document.createElement('option');
@@ -106,22 +100,33 @@ function updateDays() {
 
         const dayItem = document.createElement('div');
         dayItem.className = 'day-item';
-        if (dateStr === state.selectedDate) dayItem.classList.add('active');
+        if (state.selectedDates.includes(dateStr)) dayItem.classList.add('active');
 
         dayItem.innerHTML = `
             <span class="day-name">${dayName}</span>
             <span class="day-number">${i}</span>
         `;
 
-        dayItem.addEventListener('click', () => {
-            document.querySelectorAll('.day-item').forEach(el => el.classList.remove('active'));
-            dayItem.classList.add('active');
-            state.selectedDate = dateStr;
+        dayItem.addEventListener('click', (e) => {
+            if (e.ctrlKey || e.metaKey) {
+                if (state.selectedDates.includes(dateStr)) {
+                    state.selectedDates = state.selectedDates.filter(d => d !== dateStr);
+                    dayItem.classList.remove('active');
+                } else {
+                    state.selectedDates.push(dateStr);
+                    dayItem.classList.add('active');
+                }
+            } else {
+                document.querySelectorAll('.day-item').forEach(el => el.classList.remove('active'));
+                state.selectedDates = [dateStr];
+                dayItem.classList.add('active');
+            }
             
-            // Update habit start date when calendar date changes
-            habitStartDateInput.value = dateStr;
-            if (habitEndDateInput.value < dateStr) {
-                habitEndDateInput.value = dateStr;
+            habitStartDateInput.value = state.selectedDates[0];
+            if (state.selectedDates.length > 1) {
+              habitEndDateInput.value = state.selectedDates[state.selectedDates.length - 1];
+            } else {
+              habitEndDateInput.value = state.selectedDates[0];
             }
             
             saveState();
@@ -130,19 +135,16 @@ function updateDays() {
 
         daysContainer.appendChild(dayItem);
 
-        // Scroll to active day on initial load
-        if (dateStr === state.selectedDate) {
+        if (dateStr === state.selectedDates[0]) {
             dayItem.scrollIntoView({ behavior: 'smooth', block: 'nearest', inline: 'center' });
         }
     }
 }
 
-// Save to LocalStorage
 function saveState() {
     localStorage.setItem('minimal-tracker-state', JSON.stringify(state));
 }
 
-// Add Item
 todoForm.addEventListener('submit', (e) => {
     e.preventDefault();
 
@@ -161,7 +163,7 @@ todoForm.addEventListener('submit', (e) => {
         while (currentDate <= endDate) {
             const dateStr = getLocalDateString(currentDate);
             itemsToAdd.push({
-                id: Date.now() + Math.random(), // Unique ID for each day
+                id: Date.now() + Math.random(),
                 text: todoInput.value,
                 type: 'Habit',
                 date: dateStr,
@@ -169,29 +171,42 @@ todoForm.addEventListener('submit', (e) => {
                 completed: false,
                 completedAt: []
             });
+            if(habitTodoInput.value) {
+              itemsToAdd.push({
+                  id: Date.now() + Math.random(),
+                  text: habitTodoInput.value,
+                  type: 'Task',
+                  date: dateStr,
+                  category: 'General',
+                  completed: false,
+                  completedAt: []
+              });
+            }
             currentDate.setDate(currentDate.getDate() + 1);
         }
         
         state.items = [...itemsToAdd, ...state.items];
     } else {
-        const newItem = {
-            id: Date.now(),
-            text: todoInput.value,
-            type: 'Task',
-            date: state.selectedDate,
-            category: 'General',
-            completed: false,
-            completedAt: [] 
-        };
-        state.items.unshift(newItem);
+        state.selectedDates.forEach(dateStr => {
+          const newItem = {
+              id: Date.now() + Math.random(),
+              text: todoInput.value,
+              type: 'Task',
+              date: dateStr,
+              category: 'General',
+              completed: false,
+              completedAt: [] 
+          };
+          state.items.unshift(newItem);
+        });
     }
 
     todoInput.value = '';
+    habitTodoInput.value = '';
     saveState();
     render();
 });
 
-// Type Selection
 typeBtns.forEach(btn => {
     btn.addEventListener('click', () => {
         typeBtns.forEach(b => b.classList.remove('active'));
@@ -200,15 +215,14 @@ typeBtns.forEach(btn => {
         
         if (state.selectedType === 'Habit') {
             habitOptions.classList.remove('hidden');
-            habitStartDateInput.value = state.selectedDate;
-            habitEndDateInput.value = state.selectedDate;
+            habitStartDateInput.value = state.selectedDates[0];
+            habitEndDateInput.value = state.selectedDates[0];
         } else {
             habitOptions.classList.add('hidden');
         }
     });
 });
 
-// Toggle Completion
 function toggleComplete(id) {
     const item = state.items.find(i => i.id === id);
     if (item) {
@@ -216,10 +230,8 @@ function toggleComplete(id) {
         item.completed = !item.completed;
 
         if (item.completed && !wasCompleted) {
-            // Only add timestamp if transitioning from incomplete to completed
             item.completedAt.push(Date.now());
         } else if (!item.completed && wasCompleted) {
-            // Optional: remove the last completion record if unchecked
             item.completedAt.pop();
         }
 
@@ -228,14 +240,12 @@ function toggleComplete(id) {
     }
 }
 
-// Delete Item
 function deleteItem(id) {
     state.items = state.items.filter(i => i.id !== id);
     saveState();
     render();
 }
 
-// Stats Calculation & Chart Rendering
 function updateStats() {
     const now = new Date();
     const oneWeekAgo = new Date(now.getTime() - 7 * 24 * 60 * 60 * 1000);
@@ -257,25 +267,24 @@ function updateStats() {
     weeklyCountEl.textContent = weeklyCount;
     monthlyCountEl.textContent = monthlyCount;
 
-    // Calculate Percentage
     const percentage = totalItems > 0 ? Math.round((completedItems / totalItems) * 100) : 0;
     statPercentageEl.textContent = `${percentage}%`;
 
-    // Update Circle Chart
     progressCircle.setAttribute('stroke-dasharray', `${percentage}, 100`);
 }
 
-// Render List
 function render() {
     todoList.innerHTML = '';
 
     const filteredItems = state.items.filter(item => {
-        // Filter by date first
-        if (item.date !== state.selectedDate) return false;
+        if (state.selectedDates.length > 1) {
+          return state.selectedDates.includes(item.date);
+        } else {
+            if (item.date !== state.selectedDates[0]) return false;
 
-        // Then by type
-        if (state.filter === 'all') return true;
-        return item.type === state.filter;
+            if (state.filter === 'all') return true;
+            return item.type === state.filter;
+        }
     });
 
     if (filteredItems.length === 0) {
@@ -311,7 +320,6 @@ function render() {
 const mainContentWrapper = document.getElementById('main-content-wrapper');
 const siteTitle = document.getElementById('site-title');
 
-// UI Interactions
 statsToggleBtn.addEventListener('click', () => {
     statsDashboard.classList.toggle('hidden');
     if (!statsDashboard.classList.contains('hidden')) {
@@ -346,5 +354,4 @@ themeToggle.addEventListener('click', () => {
     saveState();
 });
 
-// Run Init
 init();
