@@ -8,7 +8,7 @@ let state = {
 // DOM Elements
 const todoForm = document.getElementById('todo-form');
 const todoInput = document.getElementById('todo-input');
-const todoCategory = document.getElementById('todo-category');
+const todoType = document.getElementById('todo-type');
 const todoDate = document.getElementById('todo-date');
 const todoList = document.getElementById('todo-list');
 const themeToggle = document.getElementById('theme-toggle');
@@ -20,6 +20,7 @@ const weeklyCountEl = document.getElementById('weekly-count');
 const monthlyCountEl = document.getElementById('monthly-count');
 const statPercentageEl = document.getElementById('stat-percentage');
 const progressCircle = document.getElementById('progress-circle');
+const filterBtns = document.querySelectorAll('.filter-btn');
 
 // Initialize
 function init() {
@@ -27,10 +28,10 @@ function init() {
     if (savedState) {
         state = JSON.parse(savedState);
     }
-    
+
     // Set initial theme
     document.body.setAttribute('data-theme', state.theme);
-    
+
     // Set default date to today
     const today = new Date().toISOString().split('T')[0];
     todoDate.value = today;
@@ -46,13 +47,13 @@ function saveState() {
 // Add Item
 todoForm.addEventListener('submit', (e) => {
     e.preventDefault();
-    
+
     const newItem = {
         id: Date.now(),
         text: todoInput.value,
-        category: todoCategory.value,
+        type: todoType.value,
         date: todoDate.value || new Date().toISOString().split('T')[0],
-        type: 'task', // Default to task
+        category: 'General', // Defaulting since it's removed
         completed: false,
         completedAt: [] 
     };
@@ -69,7 +70,7 @@ function toggleComplete(id) {
     if (item) {
         const wasCompleted = item.completed;
         item.completed = !item.completed;
-        
+
         if (item.completed && !wasCompleted) {
             // Only add timestamp if transitioning from incomplete to completed
             item.completedAt.push(Date.now());
@@ -77,7 +78,7 @@ function toggleComplete(id) {
             // Optional: remove the last completion record if unchecked
             item.completedAt.pop();
         }
-        
+
         saveState();
         render();
     }
@@ -115,7 +116,7 @@ function updateStats() {
     // Calculate Percentage
     const percentage = totalItems > 0 ? Math.round((completedItems / totalItems) * 100) : 0;
     statPercentageEl.textContent = `${percentage}%`;
-    
+
     // Update Circle Chart
     progressCircle.setAttribute('stroke-dasharray', `${percentage}, 100`);
 }
@@ -123,17 +124,22 @@ function updateStats() {
 // Render List
 function render() {
     todoList.innerHTML = '';
-    
-    state.items.forEach(item => {
+
+    const filteredItems = state.items.filter(item => {
+        if (state.filter === 'all') return true;
+        return item.type === state.filter;
+    });
+
+    filteredItems.forEach(item => {
         const li = document.createElement('li');
         li.className = `todo-item ${item.completed ? 'completed' : ''}`;
-        
+
         li.innerHTML = `
             <input type="checkbox" class="todo-checkbox" ${item.completed ? 'checked' : ''}>
             <div class="todo-content">
                 <span class="todo-text">${item.text}</span>
                 <div class="todo-meta">
-                    <span class="todo-badge">${item.category}</span>
+                    <span class="todo-badge">${item.type}</span>
                     <span>${item.date}</span>
                 </div>
             </div>
@@ -142,13 +148,12 @@ function render() {
 
         li.querySelector('.todo-checkbox').addEventListener('change', () => toggleComplete(item.id));
         li.querySelector('.delete-btn').addEventListener('click', () => deleteItem(item.id));
-        
+
         todoList.appendChild(li);
     });
 
     updateStats();
 }
-
 
 const mainContentWrapper = document.getElementById('main-content-wrapper');
 const siteTitle = document.getElementById('site-title');
@@ -172,6 +177,16 @@ siteTitle.addEventListener('click', () => {
     statsDashboard.classList.add('hidden');
     mainContentWrapper.style.display = 'block';
 });
+
+filterBtns.forEach(btn => {
+    btn.addEventListener('click', () => {
+        filterBtns.forEach(b => b.classList.remove('active'));
+        btn.classList.add('active');
+        state.filter = btn.dataset.filter;
+        render();
+    });
+});
+
 
 filterBtns.forEach(btn => {
     btn.addEventListener('click', () => {

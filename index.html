@@ -63,23 +63,26 @@
                         <input type="text" id="todo-input" placeholder="What needs to be done?" required>
                     </div>
                     <div class="options-group">
-                        <select id="todo-category">
-                            <option value="Work">Work</option>
-                            <option value="Personal">Personal</option>
+                        <select id="todo-type">
+                            <option value="Task">Task</option>
+                            <option value="Habit">Habit</option>
                         </select>
                         <input type="date" id="todo-date">
                     </div>
                     <button type="submit" id="add-btn">Add Item</button>
-                    </form>
-                    </section>
+                </form>
+            </section>
 
-                    <div id="main-content-wrapper">
-                    <main>
-                    <ul id="todo-list">
-                        <!-- Items will be added here dynamically -->
-                    </ul>
-                    </main>
-                    </div>
+            <main>
+                <div class="filter-bar">
+                    <button class="filter-btn active" data-filter="all">All</button>
+                    <button class="filter-btn" data-filter="Task">Tasks</button>
+                    <button class="filter-btn" data-filter="Habit">Habits</button>
+                </div>
+                <ul id="todo-list">
+                    <!-- Items will be added here dynamically -->
+                </ul>
+            </main>
     <script src="main.js"></script>
 </body>
 </html>
