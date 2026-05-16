@@ -10,7 +10,6 @@ const todoForm = document.getElementById('todo-form');
 const todoInput = document.getElementById('todo-input');
 const todoCategory = document.getElementById('todo-category');
 const todoDate = document.getElementById('todo-date');
-const todoType = document.getElementById('todo-type');
 const todoList = document.getElementById('todo-list');
 const themeToggle = document.getElementById('theme-toggle');
 const statsToggleBtn = document.getElementById('stats-toggle-btn');
@@ -21,7 +20,6 @@ const weeklyCountEl = document.getElementById('weekly-count');
 const monthlyCountEl = document.getElementById('monthly-count');
 const statPercentageEl = document.getElementById('stat-percentage');
 const progressCircle = document.getElementById('progress-circle');
-const filterBtns = document.querySelectorAll('.filter-btn');
 
 // Initialize
 function init() {
@@ -54,7 +52,7 @@ todoForm.addEventListener('submit', (e) => {
         text: todoInput.value,
         category: todoCategory.value,
         date: todoDate.value || new Date().toISOString().split('T')[0],
-        type: todoType.value,
+        type: 'task', // Default to task
         completed: false,
         completedAt: [] 
     };
@@ -126,12 +124,7 @@ function updateStats() {
 function render() {
     todoList.innerHTML = '';
     
-    const filteredItems = state.items.filter(item => {
-        if (state.filter === 'all') return true;
-        return item.type === state.filter;
-    });
-
-    filteredItems.forEach(item => {
+    state.items.forEach(item => {
         const li = document.createElement('li');
         li.className = `todo-item ${item.completed ? 'completed' : ''}`;
         
@@ -140,7 +133,6 @@ function render() {
             <div class="todo-content">
                 <span class="todo-text">${item.text}</span>
                 <div class="todo-meta">
-                    <span class="todo-badge">${item.type}</span>
                     <span class="todo-badge">${item.category}</span>
                     <span>${item.date}</span>
                 </div>
@@ -156,6 +148,7 @@ function render() {
 
     updateStats();
 }
+
 
 const mainContentWrapper = document.getElementById('main-content-wrapper');
 const siteTitle = document.getElementById('site-title');

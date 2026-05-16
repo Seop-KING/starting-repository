@@ -64,33 +64,22 @@
                     </div>
                     <div class="options-group">
                         <select id="todo-category">
-                            <option value="General">General</option>
                             <option value="Work">Work</option>
                             <option value="Personal">Personal</option>
-                            <option value="Health">Health</option>
                         </select>
                         <input type="date" id="todo-date">
-                        <select id="todo-type">
-                            <option value="task">Task</option>
-                            <option value="habit">Habit</option>
-                        </select>
                     </div>
                     <button type="submit" id="add-btn">Add Item</button>
-                </form>
-            </section>
+                    </form>
+                    </section>
 
-            <main>
-                <div class="filter-bar">
-                    <button class="filter-btn active" data-filter="all">All</button>
-                    <button class="filter-btn" data-filter="task">Tasks</button>
-                    <button class="filter-btn" data-filter="habit">Habits</button>
-                </div>
-                <ul id="todo-list">
-                    <!-- Items will be added here dynamically -->
-                </ul>
-            </main>
-        </div>
-    </div>
+                    <div id="main-content-wrapper">
+                    <main>
+                    <ul id="todo-list">
+                        <!-- Items will be added here dynamically -->
+                    </ul>
+                    </main>
+                    </div>
     <script src="main.js"></script>
 </body>
 </html>
