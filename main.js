@@ -9,7 +9,6 @@ const getLocalDateString = (date = new Date()) => {
 let state = {
     items: [],
     theme: 'light',
-    filter: 'all',
     selectedDate: getLocalDateString(),
 };
 
@@ -30,14 +29,12 @@ const weeklyCountEl = document.getElementById('weekly-count');
 const monthlyCountEl = document.getElementById('monthly-count');
 const statPercentageEl = document.getElementById('stat-percentage');
 const progressCircle = document.getElementById('progress-circle');
-const filterBtns = document.querySelectorAll('.filter-btn');
 
 // Initialize
 function init() {
     const savedState = localStorage.getItem('minimal-tracker-state');
     if (savedState) {
         state = JSON.parse(savedState);
-        // Ensure items is always an array
         if (!Array.isArray(state.items)) {
             state.items = [];
         }
@@ -202,11 +199,7 @@ function render() {
     todoList.innerHTML = '';
     updateCalendarSelection();
 
-    const filteredItems = state.items.filter(item => {
-        if (item.date !== state.selectedDate) return false;
-        if (state.filter === 'all') return true;
-        return item.type === state.filter;
-    });
+    const filteredItems = state.items.filter(item => item.date === state.selectedDate);
 
     if (filteredItems.length === 0) {
         todoList.innerHTML = '<li class="todo-item" style="justify-content: center; color: var(--text-muted);">No tasks for this day</li>';
@@ -257,15 +250,6 @@ closeStatsBtn.addEventListener('click', () => {
 siteTitle.addEventListener('click', () => {
     statsDashboard.classList.add('hidden');
     mainContentWrapper.style.display = 'block';
-});
-
-filterBtns.forEach(btn => {
-    btn.addEventListener('click', () => {
-        filterBtns.forEach(b => b.classList.remove('active'));
-        btn.classList.add('active');
-        state.filter = btn.dataset.filter;
-        render();
-    });
 });
 
 themeToggle.addEventListener('click', () => {
