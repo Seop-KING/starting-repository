@@ -2,19 +2,23 @@
 let state = {
     items: [],
     theme: 'light',
-    filter: 'all'
+    filter: 'all',
+    selectedDate: new Date().toISOString().split('T')[0]
 };
 
 // DOM Elements
 const todoForm = document.getElementById('todo-form');
 const todoInput = document.getElementById('todo-input');
 const todoType = document.getElementById('todo-type');
-const todoDate = document.getElementById('todo-date');
 const todoList = document.getElementById('todo-list');
 const themeToggle = document.getElementById('theme-toggle');
 const statsToggleBtn = document.getElementById('stats-toggle-btn');
 const closeStatsBtn = document.getElementById('close-stats');
 const statsDashboard = document.getElementById('stats-dashboard');
+
+const yearSelect = document.getElementById('year-select');
+const monthSelect = document.getElementById('month-select');
+const daysContainer = document.getElementById('days-container');
 
 const weeklyCountEl = document.getElementById('weekly-count');
 const monthlyCountEl = document.getElementById('monthly-count');
@@ -32,11 +36,78 @@ function init() {
     // Set initial theme
     document.body.setAttribute('data-theme', state.theme);
 
-    // Set default date to today
-    const today = new Date().toISOString().split('T')[0];
-    todoDate.value = today;
-
+    setupCalendar();
     render();
+}
+
+function setupCalendar() {
+    const now = new Date();
+    const currentYear = now.getFullYear();
+    const currentMonth = now.getMonth();
+    const currentDay = now.getDate();
+
+    // Populate Years (Current +/- 5 years)
+    for (let i = currentYear - 5; i <= currentYear + 5; i++) {
+        const option = document.createElement('option');
+        option.value = i;
+        option.textContent = i;
+        if (i === currentYear) option.selected = true;
+        yearSelect.appendChild(option);
+    }
+
+    // Populate Months
+    const monthNames = ["Jan", "Feb", "Mar", "Apr", "May", "Jun", "Jul", "Aug", "Sep", "Oct", "Nov", "Dec"];
+    monthNames.forEach((name, index) => {
+        const option = document.createElement('option');
+        option.value = index;
+        option.textContent = name;
+        if (index === currentMonth) option.selected = true;
+        monthSelect.appendChild(option);
+    });
+
+    yearSelect.addEventListener('change', updateDays);
+    monthSelect.addEventListener('change', updateDays);
+
+    updateDays();
+}
+
+function updateDays() {
+    const year = parseInt(yearSelect.value);
+    const month = parseInt(monthSelect.value);
+    const daysInMonth = new Date(year, month + 1, 0).getDate();
+
+    daysContainer.innerHTML = '';
+    const dayNames = ["Sun", "Mon", "Tue", "Wed", "Thu", "Fri", "Sat"];
+
+    for (let i = 1; i <= daysInMonth; i++) {
+        const date = new Date(year, month, i);
+        const dayName = dayNames[date.getDay()];
+        const dateStr = date.toISOString().split('T')[0];
+
+        const dayItem = document.createElement('div');
+        dayItem.className = 'day-item';
+        if (dateStr === state.selectedDate) dayItem.classList.add('active');
+
+        dayItem.innerHTML = `
+            <span class="day-name">${dayName}</span>
+            <span class="day-number">${i}</span>
+        `;
+
+        dayItem.addEventListener('click', () => {
+            document.querySelectorAll('.day-item').forEach(el => el.classList.remove('active'));
+            dayItem.classList.add('active');
+            state.selectedDate = dateStr;
+            saveState();
+            render();
+        });
+
+        daysContainer.appendChild(dayItem);
+
+        // Scroll to active day on initial load
+        if (dateStr === state.selectedDate) {
+            dayItem.scrollIntoView({ behavior: 'smooth', block: 'nearest', inline: 'center' });
+        }
+    }
 }
 
 // Save to LocalStorage
@@ -52,8 +123,8 @@ todoForm.addEventListener('submit', (e) => {
         id: Date.now(),
         text: todoInput.value,
         type: todoType.value,
-        date: todoDate.value || new Date().toISOString().split('T')[0],
-        category: 'General', // Defaulting since it's removed
+        date: state.selectedDate,
+        category: 'General',
         completed: false,
         completedAt: [] 
     };
@@ -63,7 +134,6 @@ todoForm.addEventListener('submit', (e) => {
     saveState();
     render();
 });
-
 // Toggle Completion
 function toggleComplete(id) {
     const item = state.items.find(i => i.id === id);
@@ -126,11 +196,20 @@ function render() {
     todoList.innerHTML = '';
 
     const filteredItems = state.items.filter(item => {
+        // Filter by date first
+        if (item.date !== state.selectedDate) return false;
+
+        // Then by type
         if (state.filter === 'all') return true;
         return item.type === state.filter;
     });
 
+    if (filteredItems.length === 0) {
+        todoList.innerHTML = '<li class="todo-item" style="justify-content: center; color: var(--text-muted);">No tasks for this day</li>';
+    }
+
     filteredItems.forEach(item => {
+
         const li = document.createElement('li');
         li.className = `todo-item ${item.completed ? 'completed' : ''}`;
 

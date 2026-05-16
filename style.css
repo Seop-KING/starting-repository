@@ -235,6 +235,80 @@ h2 {
 }
 
 /* Filter Bar */
+/* Calendar Section */
+#calendar-section {
+    padding: 1rem;
+}
+
+.calendar-controls {
+    display: flex;
+    gap: 0.5rem;
+    margin-bottom: 1rem;
+}
+
+.calendar-controls select {
+    padding: 0.3rem 0.6rem;
+    border: 1px solid var(--border-color);
+    border-radius: 4px;
+    background-color: var(--bg-primary);
+    color: var(--text-main);
+    font-size: 0.9rem;
+    font-weight: 600;
+}
+
+.days-wrapper {
+    display: flex;
+    gap: 0.5rem;
+    overflow-x: auto;
+    padding-bottom: 0.5rem;
+    scrollbar-width: thin;
+    scrollbar-color: var(--accent-color) transparent;
+}
+
+.days-wrapper::-webkit-scrollbar {
+    height: 4px;
+}
+
+.days-wrapper::-webkit-scrollbar-thumb {
+    background: var(--accent-color);
+    border-radius: 10px;
+}
+
+.day-item {
+    flex: 0 0 40px;
+    height: 45px;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    border: 1px solid var(--border-color);
+    border-radius: 8px;
+    cursor: pointer;
+    transition: var(--transition);
+    background-color: var(--bg-primary);
+}
+
+.day-item:hover {
+    border-color: var(--accent-color);
+}
+
+.day-item.active {
+    background-color: var(--accent-color);
+    color: var(--accent-contrast);
+    border-color: var(--accent-color);
+}
+
+.day-name {
+    font-size: 0.6rem;
+    text-transform: uppercase;
+    font-weight: 700;
+}
+
+.day-number {
+    font-size: 1rem;
+    font-weight: 700;
+}
+
 .filter-bar {
     display: flex;
     gap: 0.5rem;
